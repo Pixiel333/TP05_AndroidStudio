@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Biblio</string>
+    <string name="titre">Mes livres</string>
+    <string name="textIsbn">ISBN</string>
+    <string name="textTitre">Titre</string>
+    <string name="textAnnee">Année parution</string>
+    <string name="textAuteur">Auteur</string>
+    <string name="textNbPages">Nombre pages</string>
+    <string name="textEditeur">Auteur</string>
+    <string name="textModif">Modifier</string>
+    <string name="textSuppr">Supprimer</string>
+    <string name="textValid">Valider</string>
+    <string name="textAnnul">Annuler</string>
+</resources>
