@@ -58,4 +58,18 @@ public class BiblioDAO {
         // modifie le livre dans la table
         maBase.update("Livre", v, "isbnLivre = ?", new String[]{unLivre.getIsbn()});
     }
+
+    public void ajouterLivre(Livre unLivre) {
+        //création d'un ContentValues
+        ContentValues v = new ContentValues();
+        // ajout des propriétés au ContentValues
+        v.put("isbnLivre", unLivre.getIsbn());
+        v.put("titreLivre", unLivre.getTitre());
+        v.put("anneeLivre", unLivre.getAnnee());
+        v.put("auteurLivre", unLivre.getAuteur());
+        v.put("pagesLivre", unLivre.getNbPages());
+        v.put("editeurLivre", unLivre.getEditeur());
+        // ajout du livre dans la table
+        maBase.insert("Livre", null, v);
+    }
 }

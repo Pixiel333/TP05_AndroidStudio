@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView lstLivres = null;
     private BiblioDAO maBDD;
     private ArrayList<HashMap<String,String>> lesLivres;
+    private Button btnAjouter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
         // chargement de la ListView
         initLstLivres();
 
+        // obtention de la réference du bouton
+        btnAjouter = (Button) findViewById(R.id.ajouter);
+        btnAjouter.setVisibility(View.VISIBLE);
+
+        // ecouteur sur le bouton ajouter
+        btnAjouter.setOnClickListener(EcouteurBouton);
+
         // écouteur d'évènement sur la listView
         lstLivres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -41,12 +50,26 @@ public class MainActivity extends AppCompatActivity {
                 String isbnSelect = item.get("ISBN");
                 Intent gererLivre = new Intent(MainActivity.this, GererLivre.class);
                 gererLivre.putExtra("ISBN", isbnSelect);
+                gererLivre.putExtra("AJOUTER", "FALSE");
                 startActivity(gererLivre);
 
             }
         });
 
     }
+    public View.OnClickListener EcouteurBouton = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // quel bouton a été cliqué ?
+            switch (view.getId()) {
+                case R.id.ajouter:
+                    Intent gererLivre = new Intent(MainActivity.this, GererLivre.class);
+                    gererLivre.putExtra("AJOUTER", "TRUE");
+                    startActivity(gererLivre);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onResume () {

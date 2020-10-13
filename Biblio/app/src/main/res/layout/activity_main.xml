@@ -20,5 +20,12 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp">
     </ListView>
+    <Button
+        android:id="@+id/ajouter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
+        android:text="Ajouter" />
 
 </LinearLayout>

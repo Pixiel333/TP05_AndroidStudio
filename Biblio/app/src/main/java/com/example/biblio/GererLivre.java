@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class GererLivre extends AppCompatActivity {
     private EditText editISBN;
@@ -24,6 +25,8 @@ public class GererLivre extends AppCompatActivity {
     private BiblioDAO maBDD;
     private String isbn="";
     private Livre leLivre;
+    private String boolAjouter="";
+    private Livre nouvLivre;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,41 +45,50 @@ public class GererLivre extends AppCompatActivity {
         editPages = (EditText) findViewById(R.id.nbPages);
         editEditeur = (EditText) findViewById(R.id.editeur);
 
-        // rend inaccessible la vue
-        editISBN.setEnabled(false);
-        editAnnee.setEnabled(false);
-        editAuteur.setEnabled(false);
-        editTitre.setEnabled(false);
-        editPages.setEnabled(false);
-        editEditeur.setEnabled(false);
-
-        // rend invisible la vue
-        btnValider.setVisibility(View.INVISIBLE);
-        btnAnnuler.setVisibility(View.INVISIBLE);
-
         // on récupère l'intent qui a lancé l'activité
         Intent i = getIntent();
-        isbn = i.getStringExtra("ISBN");
+        boolAjouter = i.getStringExtra("AJOUTER");
+        if (boolAjouter.equals("FALSE")) {
+            isbn = i.getStringExtra("ISBN");
 
+            // rend inaccessible la vue
+            editISBN.setEnabled(false);
+            editAnnee.setEnabled(false);
+            editAuteur.setEnabled(false);
+            editTitre.setEnabled(false);
+            editPages.setEnabled(false);
+            editEditeur.setEnabled(false);
+
+            // rend invisible la vue
+            btnValider.setVisibility(View.INVISIBLE);
+            btnAnnuler.setVisibility(View.INVISIBLE);
+
+            leLivre = maBDD.selectionnerUnLivre(isbn);
+
+            editISBN.setText(leLivre.getIsbn());
+            editEditeur.setText(leLivre.getEditeur());
+            editTitre.setText(leLivre.getTitre());
+            editAuteur.setText(leLivre.getAuteur());
+            editPages.setText(Integer.toString(leLivre.getNbPages()));
+            editAnnee.setText(Integer.toString(leLivre.getAnnee()));
+        }
+        else {
+            btnModifier.setVisibility(View.INVISIBLE);
+            btnDelete.setVisibility(View.INVISIBLE);
+        }
         //ecouteur sur les boutons
         btnDelete.setOnClickListener(EcouteurBouton);
         btnModifier.setOnClickListener(EcouteurBouton);
         btnAnnuler.setOnClickListener(EcouteurBouton);
         btnValider.setOnClickListener(EcouteurBouton);
 
-        leLivre = maBDD.selectionnerUnLivre(isbn);
-
-        editISBN.setText(leLivre.getIsbn());
-        editEditeur.setText(leLivre.getEditeur());
-        editTitre.setText(leLivre.getTitre());
-        editAuteur.setText(leLivre.getAuteur());
-        editPages.setText(Integer.toString(leLivre.getNbPages()));
-        editAnnee.setText(Integer.toString(leLivre.getAnnee()));
     }
 
     public View.OnClickListener EcouteurBouton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            Intent i = getIntent();
+            boolAjouter = i.getStringExtra("AJOUTER");
             // quel bouton a été cliqué ?
             switch (view.getId()){
                 case R.id.supprimer :
@@ -87,6 +99,8 @@ public class GererLivre extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             maBDD.supprimerLivre(isbn);
+                            Intent mainActivity = new Intent(GererLivre.this, MainActivity.class);
+                            startActivity(mainActivity);
                             }
                     });
                     boite.setNegativeButton("NON", new DialogInterface.OnClickListener() {
@@ -110,46 +124,67 @@ public class GererLivre extends AppCompatActivity {
                     editTitre.requestFocus();
                     break;
                 case R.id.annuler :
-                    editISBN.setText(leLivre.getIsbn());
-                    editEditeur.setText(leLivre.getEditeur());
-                    editTitre.setText(leLivre.getTitre());
-                    editAuteur.setText(leLivre.getAuteur());
-                    editPages.setText(Integer.toString(leLivre.getNbPages()));
-                    editAnnee.setText(Integer.toString(leLivre.getAnnee()));
-                    btnValider.setVisibility(View.INVISIBLE);
-                    btnAnnuler.setVisibility(View.INVISIBLE);
-                    btnModifier.setVisibility(View.VISIBLE);
-                    btnDelete.setVisibility(View.VISIBLE);
-                    editAnnee.setEnabled(false);
-                    editAuteur.setEnabled(false);
-                    editTitre.setEnabled(false);
-                    editPages.setEnabled(false);
-                    editEditeur.setEnabled(false);
+                    if (boolAjouter.equals("FALSE")) {
+                        editISBN.setText(leLivre.getIsbn());
+                        editEditeur.setText(leLivre.getEditeur());
+                        editTitre.setText(leLivre.getTitre());
+                        editAuteur.setText(leLivre.getAuteur());
+                        editPages.setText(Integer.toString(leLivre.getNbPages()));
+                        editAnnee.setText(Integer.toString(leLivre.getAnnee()));
+                        btnValider.setVisibility(View.INVISIBLE);
+                        btnAnnuler.setVisibility(View.INVISIBLE);
+                        btnModifier.setVisibility(View.VISIBLE);
+                        btnDelete.setVisibility(View.VISIBLE);
+                        editAnnee.setEnabled(false);
+                        editAuteur.setEnabled(false);
+                        editTitre.setEnabled(false);
+                        editPages.setEnabled(false);
+                        editEditeur.setEnabled(false);
+                    }
+                    else {
+                        Intent mainActivity = new Intent(GererLivre.this, MainActivity.class);
+                        startActivity(mainActivity);
+                    }
                     break;
                 case R.id.valider :
-                    leLivre.setTitre(editTitre.getText().toString());
-                    leLivre.setAuteur(editAuteur.getText().toString());
-                    leLivre.setAnnee(Integer.parseInt(editAnnee.getText().toString()));
-                    leLivre.setNbPages(Integer.parseInt(editPages.getText().toString()));
-                    leLivre.setEditeur(editEditeur.getText().toString());
-                    maBDD.modifierLivre(leLivre);
-                    editISBN.setText(leLivre.getIsbn());
-                    editEditeur.setText(leLivre.getEditeur());
-                    editTitre.setText(leLivre.getTitre());
-                    editAuteur.setText(leLivre.getAuteur());
-                    editPages.setText(Integer.toString(leLivre.getNbPages()));
-                    editAnnee.setText(Integer.toString(leLivre.getAnnee()));
-                    btnValider.setVisibility(View.INVISIBLE);
-                    btnAnnuler.setVisibility(View.INVISIBLE);
-                    btnModifier.setVisibility(View.VISIBLE);
-                    btnDelete.setVisibility(View.VISIBLE);
-                    editAnnee.setEnabled(false);
-                    editAuteur.setEnabled(false);
-                    editTitre.setEnabled(false);
-                    editPages.setEnabled(false);
-                    editEditeur.setEnabled(false);
+                    if (boolAjouter.equals("FALSE")) {
+                        leLivre.setTitre(editTitre.getText().toString());
+                        leLivre.setAuteur(editAuteur.getText().toString());
+                        leLivre.setAnnee(Integer.parseInt(editAnnee.getText().toString()));
+                        leLivre.setNbPages(Integer.parseInt(editPages.getText().toString()));
+                        leLivre.setEditeur(editEditeur.getText().toString());
+                        maBDD.modifierLivre(leLivre);
+                        editISBN.setText(leLivre.getIsbn());
+                        editEditeur.setText(leLivre.getEditeur());
+                        editTitre.setText(leLivre.getTitre());
+                        editAuteur.setText(leLivre.getAuteur());
+                        editPages.setText(Integer.toString(leLivre.getNbPages()));
+                        editAnnee.setText(Integer.toString(leLivre.getAnnee()));
+                        btnValider.setVisibility(View.INVISIBLE);
+                        btnAnnuler.setVisibility(View.INVISIBLE);
+                        btnModifier.setVisibility(View.VISIBLE);
+                        btnDelete.setVisibility(View.VISIBLE);
+                        editAnnee.setEnabled(false);
+                        editAuteur.setEnabled(false);
+                        editTitre.setEnabled(false);
+                        editPages.setEnabled(false);
+                        editEditeur.setEnabled(false);
+                    }
+                    else {
+                        nouvLivre = new Livre();
+                        nouvLivre.setIsbn(editISBN.getText().toString());
+                        nouvLivre.setTitre(editTitre.getText().toString());
+                        nouvLivre.setAuteur(editAuteur.getText().toString());
+                        nouvLivre.setAnnee(Integer.parseInt(editAnnee.getText().toString()));
+                        nouvLivre.setNbPages(Integer.parseInt(editPages.getText().toString()));
+                        nouvLivre.setEditeur(editEditeur.getText().toString());
+                        maBDD.ajouterLivre(nouvLivre);
+                        Toast msg = Toast.makeText(GererLivre.this,"Livre bien ajouter", Toast.LENGTH_SHORT);
+                        msg.show();
+                        Intent mainActivity = new Intent(GererLivre.this, MainActivity.class);
+                        startActivity(mainActivity);
+                    }
                     break;
-
             }
         }
     };
